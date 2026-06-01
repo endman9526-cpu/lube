@@ -1454,58 +1454,6 @@ p { line-height: 1.75; }
 }
 .float-btn:hover .float-tooltip { opacity: 1; }
 
-/* 小程序二维码弹窗 */
-.mp-qr-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 250ms;
-}
-.mp-qr-modal.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-.mp-qr-content {
-  position: relative;
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px 28px 24px;
-  text-align: center;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
-  max-width: 300px;
-  width: 90%;
-}
-.mp-qr-content img {
-  width: 220px;
-  height: 220px;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-.mp-qr-content p {
-  font-size: 14px;
-  color: #333;
-  font-weight: 600;
-  margin: 0;
-}
-.mp-qr-close {
-  position: absolute;
-  top: 8px;
-  right: 14px;
-  font-size: 24px;
-  color: #999;
-  cursor: pointer;
-  line-height: 1;
-  transition: color 200ms;
-}
-.mp-qr-close:hover { color: #333; }
-
 /* 滚动进度条 */
 .scroll-progress {
   position: fixed;
