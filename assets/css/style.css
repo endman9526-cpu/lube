@@ -1454,6 +1454,58 @@ p { line-height: 1.75; }
 }
 .float-btn:hover .float-tooltip { opacity: 1; }
 
+/* 客服微信二维码弹窗 */
+.wechat-qr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms;
+}
+.wechat-qr-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.wechat-qr-content {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+  max-width: 280px;
+  width: 90%;
+}
+.wechat-qr-content img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.wechat-qr-content p {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+}
+.wechat-qr-close {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 200ms;
+}
+.wechat-qr-close:hover { color: #333; }
+
 /* 滚动进度条 */
 .scroll-progress {
   position: fixed;
