@@ -1435,8 +1435,6 @@ p { line-height: 1.75; }
 }
 .float-btn.blue { background: var(--brand-blue); box-shadow: 0 6px 24px rgba(30,111,222,0.4); }
 .float-btn.blue:hover { box-shadow: 0 8px 32px rgba(30,111,222,0.5); }
-.float-btn.green { background: #07C160; box-shadow: 0 6px 24px rgba(7,193,96,0.4); }
-.float-btn.green:hover { box-shadow: 0 8px 32px rgba(7,193,96,0.5); }
 .float-btn svg { width: 22px; height: 22px; }
 .float-tooltip {
   position: absolute;
