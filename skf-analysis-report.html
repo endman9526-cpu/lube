@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKF经销商查询页分析 — 蜀利元官网借鉴报告</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:#F5F7FA; color:#1A1A1A; line-height:1.8; }
+  .wrap { max-width:900px; margin:0 auto; padding:40px 24px; }
+  h1 { font-size:28px; font-weight:800; margin-bottom:8px; color:#C41230; }
+  h2 { font-size:22px; font-weight:700; margin:40px 0 16px; color:#1A1A1A; border-left:4px solid #C41230; padding-left:12px; }
+  h3 { font-size:17px; font-weight:600; margin:24px 0 12px; color:#333; }
+  p { font-size:15px; color:#333; margin-bottom:12px; }
+  ul, ol { margin:0 0 16px 20px; }
+  li { font-size:15px; color:#333; margin-bottom:6px; }
+  .meta { font-size:13px; color:#6B7280; margin-bottom:32px; }
+  .card { background:#fff; border-radius:12px; padding:24px; margin-bottom:20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+  .card-red { border-left:4px solid #C41230; }
+  .card-blue { border-left:4px solid #1E6FDE; }
+  .card-green { border-left:4px solid #22C55E; }
+  .tag { display:inline-block; padding:2px 10px; border-radius:4px; font-size:12px; font-weight:600; margin-right:6px; }
+  .tag-high { background:#FEE2E2; color:#DC2626; }
+  .tag-mid { background:#FEF3C7; color:#D97706; }
+  .tag-low { background:#D1FAE5; color:#059669; }
+  .tag-done { background:#DBEAFE; color:#2563EB; }
+  code { background:#F5F7FA; padding:2px 6px; border-radius:4px; font-size:13px; color:#C41230; }
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
+  .compare-box { padding:16px; border-radius:8px; }
+  .compare-skf { background:#EFF6FF; border:1px solid #BFDBFE; }
+  .compare-sly { background:#FEF2F2; border:1px solid #FECACA; }
+  .compare-box h4 { font-size:14px; margin-bottom:8px; }
+  .compare-skf h4 { color:#1E40AF; }
+  .compare-sly h4 { color:#991B1B; }
+  .compare-box p { font-size:13px; margin:0; }
+  table { width:100%; border-collapse:collapse; margin:16px 0; font-size:14px; }
+  th { background:#C41230; color:#fff; padding:10px 12px; text-align:left; font-weight:600; }
+  td { padding:10px 12px; border-bottom:1px solid #E5E7EB; }
+  tr:hover td { background:#F9FAFB; }
+  .priority { font-weight:700; }
+  .p1 { color:#DC2626; }
+  .p2 { color:#D97706; }
+  .p3 { color:#059669; }
+  .note { background:#FFF7ED; border:1px solid #FED7AA; border-radius:8px; padding:16px; margin:16px 0; font-size:14px; }
+  .note strong { color:#C2410C; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SKF 经销商查询页分析报告</h1>
+  <p class="meta">分析对象：https://find-a-distributor.skf.com.cn/ ｜ 适配目标：蜀利元智能润滑器官网</p>
+
+  <h2>一、SKF 页面功能全景</h2>
+
+  <div class="card card-red">
+    <h3>页面定位</h3>
+    <p>SKF（斯凯孚）作为全球轴承行业巨头，建立了专门的「授权合作伙伴查询页」，让客户能快速找到全国各地的授权经销商。这是一个<strong>功能性工具页面</strong>，而非营销展示页。</p>
+  </div>
+
+  <div class="card card-blue">
+    <h3>技术架构</h3>
+    <ul>
+      <li><strong>CSS框架</strong>：Tailwind CSS（通过 output.css 编译输出）</li>
+      <li><strong>地图服务</strong>：天地图 API（tianditu.gov.cn），国家测绘地理信息局官方地图服务</li>
+      <li><strong>后端API</strong>：自建 RESTful API
+        <ul>
+          <li><code>POST /api/backend/getDistributorZXList</code> — 分页获取经销商列表（支持省份/类型筛选）</li>
+          <li><code>GET /api/backend/getDealersZXByList</code> — 获取经销商类型树形结构</li>
+        </ul>
+      </li>
+      <li><strong>前端框架</strong>：原生 JavaScript（无 Vue/React），DOM 直接操作</li>
+    </ul>
+  </div>
+
+  <div class="card card-green">
+    <h3>核心功能模块拆解</h3>
+    <table>
+      <tr>
+        <th>模块</th>
+        <th>功能描述</th>
+        <th>实现细节</th>
+      </tr>
+      <tr>
+        <td><strong>文本搜索</strong></td>
+        <td>按省份或经销商名称搜索</td>
+        <td>input 监听 change 事件，触发 API 请求，重置页码为1</td>
+      </tr>
+      <tr>
+        <td><strong>树形筛选器</strong></td>
+        <td>按经销商类型筛选（父子级联动）</td>
+        <td>自定义 checkbox 树组件，支持折叠/展开、父子联动选中、已选标签回显、重置</td>
+      </tr>
+      <tr>
+        <td><strong>经销商列表</strong></td>
+        <td>左栏展示经销商卡片，可滚动+分页</td>
+        <td>每条含：地图图标、名称（蓝色可点击）、类型标签、地址；每页10条</td>
+      </tr>
+      <tr>
+        <td><strong>详情面板</strong></td>
+        <td>点击名称展开详细信息</td>
+        <td>显示：地址、邮箱、电话、手机、授权类别；有关闭按钮返回列表</td>
+      </tr>
+      <tr>
+        <td><strong>交互地图</strong></td>
+        <td>右栏天地图，标注所有经销商位置</td>
+        <td>红色标记点，点击弹出信息窗口显示名称；选择列表项时地图自动居中放大</td>
+      </tr>
+      <tr>
+        <td><strong>列表-地图联动</strong></td>
+        <td>左右两栏数据同步</td>
+        <td>点击列表名称 → 地图居中到该点（zoom=12）；地图标记点击 → 弹出名称</td>
+      </tr>
+      <tr>
+        <td><strong>分页组件</strong></td>
+        <td>底部页码导航</td>
+        <td>显示当前页/总页数，点击切换并重新请求数据</td>
+      </tr>
+      <tr>
+        <td><strong>面包屑导航</strong></td>
+        <td>层级路径指示</td>
+        <td>首页 / 支持 / 查找斯凯孚SKF授权合作伙伴</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>二、蜀利元官网现状对比</h2>
+
+  <div class="compare">
+    <div class="compare-box compare-skf">
+      <h4>SKF 查询页</h4>
+      <p>功能型工具页，强调「找到经销商」<br>交互式地图 + 搜索筛选 + 列表详情<br>Tailwind CSS，功能优先<br>天地图 API 真实地图<br>后端API动态数据</p>
+    </div>
+    <div class="compare-box compare-sly">
+      <h4>蜀利元 联系我们页</h4>
+      <p>营销型展示页，强调「联系我们」<br>静态地图占位 + 表单留言 + 微信二维码<br>自定义CSS，视觉精美<br>SVG网格模拟地图（非真实）<br>前端静态数据</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>关键差距：</strong>蜀利元当前的联系页面地图区域只是一个 SVG 网格装饰 + 文字地址，并非真实可交互地图。SKF 的地图是真实天地图，支持缩放、标记点击、自动定位。
+  </div>
+
+  <h2>三、可借鉴功能及优先级</h2>
+
+  <table>
+    <tr>
+      <th>借鉴功能</th>
+      <th>优先级</th>
+      <th>适配方式</th>
+      <th>工作量</th>
+    </tr>
+    <tr>
+      <td><strong>真实交互地图</strong><br>替换静态占位图</td>
+      <td class="priority p1">P0 — 立即</td>
+      <td>在联系我们页嵌入高德地图 JS API，标记公司位置，支持缩放/导航。免费、国内体验好、文档全</td>
+      <td>小（半天）</td>
+    </tr>
+    <tr>
+      <td><strong>服务网点/案例展示页</strong><br>列表+地图双栏</td>
+      <td class="priority p1">P0 — 高价值</td>
+      <td>新建 dealers.html 或改造 solutions.html，展示已服务客户/合作网点。左侧列表卡片，右侧地图标注</td>
+      <td>中（2-3天）</td>
+    </tr>
+    <tr>
+      <td><strong>搜索筛选功能</strong><br>按地区/行业筛选</td>
+      <td class="priority p2">P1 — 推荐</td>
+      <td>配合服务网点页，增加按省份/行业的下拉筛选。数据量小时可用前端筛选，无需后端API</td>
+      <td>中（1-2天）</td>
+    </tr>
+    <tr>
+      <td><strong>列表-地图联动</strong><br>点击列表→地图定位</td>
+      <td class="priority p2">P1 — 推荐</td>
+      <td>列表项点击时，地图 smooth panTo 对应坐标并放大，高亮标记</td>
+      <td>小（半天）</td>
+    </tr>
+    <tr>
+      <td><strong>详情面板</strong><br>点击展开详细信息</td>
+      <td class="priority p2">P1 — 推荐</td>
+      <td>网点卡片点击展开：地址、电话、覆盖行业、服务年限、导航链接</td>
+      <td>小（半天）</td>
+    </tr>
+    <tr>
+      <td><strong>面包屑导航统一</strong><br>全站子页面</td>
+      <td class="priority p3">P2 — 优化</td>
+      <td>contact.html 已有面包屑，将其提取为公共组件，统一应用到 products/knowledge/solutions</td>
+      <td>小（2小时）</td>
+    </tr>
+    <tr>
+      <td><strong>站内搜索</strong><br>导航栏增加搜索</td>
+      <td class="priority p3">P2 — 优化</td>
+      <td>导航栏增加搜索图标，点击展开搜索框，支持搜索产品/知识文章</td>
+      <td>中（1天）</td>
+    </tr>
+    <tr>
+      <td><strong>分页组件</strong><br>大量数据分页</td>
+      <td class="priority p3">P2 — 可选</td>
+      <td>当案例/网点数量超过20个时启用，前端分页即可</td>
+      <td>小（半天）</td>
+    </tr>
+  </table>
+
+  <h2>四、具体实施方案</h2>
+
+  <div class="card card-red">
+    <h3>方案A：联系我们页地图升级 <span class="tag tag-high">P0 推荐</span></h3>
+    <p><strong>目标</strong>：将当前的 SVG 网格占位图替换为真实的高德地图</p>
+    <ol>
+      <li>注册高德开放平台账号，获取 JS API Key（免费）</li>
+      <li>在 contact.html 的地图区域引入高德地图 SDK</li>
+      <li>用公司实际坐标（成都市龙泉驿区成龙大道中段1118号）创建标记点</li>
+      <li>添加信息窗口：公司名称 + 地址 + 「点击导航」按钮（跳转高德地图APP）</li>
+      <li>保留现有的「高德地图导航」按钮，改为直接在地图上操作</li>
+    </ol>
+    <p><strong>效果</strong>：用户可以直接在网页上查看公司位置、缩放地图、点击导航，体验质的飞跃。</p>
+  </div>
+
+  <div class="card card-blue">
+    <h3>方案B：新建「服务网点」页面 <span class="tag tag-high">P0 高价值</span></h3>
+    <p><strong>目标</strong>：借鉴 SKF 的经销商查询页模式，创建蜀利元的服务网点/合作客户展示页</p>
+    <ol>
+      <li><strong>页面结构</strong>：导航栏增加「服务网络」入口</li>
+      <li><strong>搜索区</strong>：省份下拉 + 行业下拉（工业制造/风电/工程机械等）</li>
+      <li><strong>左栏列表</strong>：服务网点卡片（名称、覆盖区域、行业、地址、电话）</li>
+      <li><strong>右栏地图</strong>：高德地图标注所有网点位置</li>
+      <li><strong>联动</strong>：点击列表项 → 地图居中放大；点击标记 → 列表高亮</li>
+      <li><strong>详情</strong>：点击展开服务案例、联系方式、导航按钮</li>
+    </ol>
+    <p><strong>数据来源</strong>：前端 JSON 静态数据即可（蜀利元目前规模不需要后端API）。将已服务客户按地区整理为 JSON 数据文件。</p>
+    <p><strong>价值</strong>：展示已服务客户分布 → 增强信任感 → 促进转化。比单纯的「合作企业A/B/C」占位符强100倍。</p>
+  </div>
+
+  <div class="card card-green">
+    <h3>方案C：导航栏增强 <span class="tag tag-mid">P1</span></h3>
+    <ol>
+      <li>导航栏增加搜索图标，点击展开搜索框（搜索产品/知识文章）</li>
+      <li>所有子页面统一面包屑组件（首页 › 产品中心 / 技术知识 / ...）</li>
+      <li>增加「服务网络」导航入口（如果实施方案B）</li>
+    </ol>
+  </div>
+
+  <h2>五、SKF 页面的不足（蜀利元应避免）</h2>
+  <div class="card card-red">
+    <ul>
+      <li><strong>视觉设计粗糙</strong>：纯 Tailwind 工具类堆砌，缺乏品牌视觉设计。蜀利元现有设计更精美，应保持</li>
+      <li><strong>无移动端适配</strong>：双栏布局在小屏幕上挤压严重。蜀利元需做好响应式（列表在上、地图在下）</li>
+      <li><strong>SEO 不足</strong>：缺少 meta description、无语义化 HTML。蜀利元已有 SEO 意识，应保持</li>
+      <li><strong>加载性能</strong>：天地图 API 加载较慢。建议用高德地图（国内CDN快）或按需加载</li>
+      <li><strong>无空状态提示</strong>：搜索无结果时无友好提示。蜀利元应加「未找到匹配网点」的空状态</li>
+    </ul>
+  </div>
+
+  <h2>六、总结</h2>
+  <div class="card card-blue">
+    <p>SKF 经销商查询页的核心价值在于：<strong>用「列表+地图」双栏联动的方式，让客户快速找到附近的服务商</strong>。</p>
+    <p>蜀利元最值得借鉴的两件事：</p>
+    <ol>
+      <li><strong>立即做</strong>：将联系页的假地图换成真实高德地图（工作量极小，效果明显）</li>
+      <li><strong>值得做</strong>：新建服务网点展示页，把已服务客户在地图上标注出来（信任背书效果远超「合作企业A/B/C」占位符）</li>
+    </ol>
+    <p>SKF 页面的交互模式（搜索→筛选→列表→地图联动→详情）是一个成熟的功能范式，但视觉层面蜀利元无需照搬——保持现有的精致设计风格，融入这些功能交互即可。</p>
+  </div>
+</div>
+</body>
+</html>

@@ -6,6 +6,8 @@
   <meta name="description" content="联系蜀利元智能润滑器 - 获取产品报价、技术咨询、在线留言，24小时内回复">
   <title>联系我们 - 蜀利元智能润滑器</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23C41230'/><text y='22' x='5' font-size='18' fill='white' font-weight='bold'>蜀</text></svg>">
   <style>
     .contact-section { padding: 80px 0; background: var(--bg-gray); }
@@ -17,47 +19,79 @@
     }
     .map-wrap {
       width: 100%;
-      height: 360px;
-      background: linear-gradient(135deg, #e8ecf4, #dfe4f0);
+      height: 420px;
       position: relative;
-      overflow: hidden;
+    }
+    #companyMap {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #e8ecf4;
+    }
+    /* Leaflet 样式覆盖 */
+    .leaflet-control-zoom a {
+      color: #333 !important;
+      text-decoration: none !important;
+    }
+    /* 地图上的信息浮层 */
+    .map-info-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.85) 60%, transparent);
+      padding: 28px 24px 20px;
+      pointer-events: none;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    .map-placeholder {
-      text-align: center;
-    }
-    .map-placeholder svg { width: 48px; height: 48px; color: var(--brand-blue); margin-bottom: 12px; }
-    .map-placeholder p { font-size: 14px; color: var(--text-muted); }
-    .map-placeholder .address {
-      font-size: 16px;
-      font-weight: 600;
+    .map-info-overlay .address-text {
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text-primary);
-      margin-top: 8px;
     }
-    .map-pin {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -100%);
-      width: 40px;
-      height: 40px;
+    .map-info-overlay .address-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .map-info-overlay .map-actions {
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+    .map-info-overlay .map-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all 200ms;
+    }
+    .map-btn-nav {
       background: var(--brand-red);
-      border-radius: 50% 50% 50% 0;
-      transform: translate(-50%, -80%) rotate(-45deg);
-      box-shadow: 0 4px 16px rgba(196,18,48,0.4);
+      color: white;
+      border: none;
     }
-    .map-pin::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 14px;
-      height: 14px;
-      background: white;
-      border-radius: 50%;
+    .map-btn-nav:hover { background: #a30e28; color: white; }
+    .map-btn-big {
+      background: var(--bg-white);
+      color: var(--brand-blue);
+      border: 1.5px solid rgba(30,111,222,0.25);
+    }
+    .map-btn-big:hover { background: var(--brand-blue); color: white; border-color: var(--brand-blue); }
+
+    @media(max-width:767px) {
+      .map-wrap { height: 340px; }
+      .map-info-overlay { padding: 20px 16px 16px; flex-direction: column; align-items: flex-start; }
     }
     
     /* FAQ */
@@ -243,12 +277,163 @@
       flex-shrink: 0;
     }
 
+    /* 经销商查询 */
+    .dealer-section { padding: 64px 0; background: var(--bg-gray); }
+    .dealer-header-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .dealer-search-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .dealer-search-input {
+      padding: 10px 16px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      width: 260px;
+      background: var(--bg-white);
+      transition: border-color 200ms;
+    }
+    .dealer-search-input:focus {
+      outline: none;
+      border-color: var(--brand-red);
+    }
+    .dealer-select {
+      padding: 10px 36px 10px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      background: var(--bg-white);
+      color: var(--text-primary);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: border-color 200ms;
+    }
+    .dealer-select:focus {
+      outline: none;
+      border-color: var(--brand-red);
+    }
+    .dealer-count {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .dealer-count strong { color: var(--brand-red); }
+    .dealer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .dealer-card {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: all 300ms;
+    }
+    .dealer-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(196,18,48,0.2);
+    }
+    .dealer-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .dealer-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .dealer-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .dealer-badge.auth { background: rgba(196,18,48,0.08); color: var(--brand-red); border: 1px solid rgba(196,18,48,0.2); }
+    .dealer-badge.partner { background: rgba(30,111,222,0.08); color: var(--brand-blue); border: 1px solid rgba(30,111,222,0.2); }
+    .dealer-card .dealer-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .dealer-card .dealer-info-row svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .dealer-card .dealer-actions {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+    }
+    .dealer-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 200ms;
+      text-decoration: none;
+    }
+    .dealer-btn.tel {
+      background: rgba(196,18,48,0.06);
+      color: var(--brand-red);
+      border: 1px solid rgba(196,18,48,0.15);
+    }
+    .dealer-btn.tel:hover { background: var(--brand-red); color: white; }
+    .dealer-btn.map {
+      background: rgba(30,111,222,0.06);
+      color: var(--brand-blue);
+      border: 1px solid rgba(30,111,222,0.15);
+    }
+    .dealer-btn.map:hover { background: var(--brand-blue); color: white; }
+    .dealer-empty {
+      text-align: center;
+      padding: 56px 20px;
+      color: var(--text-muted);
+    }
+    .dealer-empty svg { margin-bottom: 16px; }
+    .dealer-empty p { font-size: 14px; }
+
+    @media(max-width:991px) {
+      .dealer-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     @media(max-width:767px) {
       .quick-contact-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
       .wechat-inner { flex-direction: column; gap: 32px; text-align: center; }
       .wechat-info h3 { font-size: 20px; }
       .wechat-steps { align-items: center; }
+      .dealer-grid { grid-template-columns: 1fr; }
+      .dealer-search-bar { width: 100%; }
+      .dealer-search-input { width: 100%; }
+      .dealer-header-wrap { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -265,6 +450,7 @@
     <nav class="navbar-nav">
       <a href="index.html" class="nav-link">首页</a>
       <a href="products.html" class="nav-link">产品中心</a>
+      <a href="knowledge.html" class="nav-link">技术知识</a>
       <a href="solutions.html" class="nav-link">解决方案</a>
       <a href="contact.html" class="nav-link active">联系我们</a>
     </nav>
@@ -275,6 +461,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" class="nav-link">首页</a>
   <a href="products.html" class="nav-link">产品中心</a>
+  <a href="knowledge.html" class="nav-link">技术知识</a>
   <a href="solutions.html" class="nav-link">解决方案</a>
   <a href="contact.html" class="nav-link active">联系我们</a>
   <a href="http://shuliyuan.com.cn/" target="_blank" class="btn btn-primary">控制中心</a>
@@ -293,40 +480,7 @@
   </div>
 </section>
 
-<!-- ===== 快速联系方式 ===== -->
-<section class="section-pad-sm" style="background:var(--bg-white)">
-  <div class="container">
-    <div class="quick-contact-grid">
-      <div class="quick-contact-card fade-up">
-        <div class="quick-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        </div>
-        <h4>电话咨询</h4>
-        <div class="contact-val">028-88417995</div>
-        <div class="contact-note">周一至周五 9:00 - 18:00</div>
-        <a href="tel:02888417995" class="btn btn-secondary btn-sm" style="margin-top:16px;width:100%;justify-content:center">立即拨打</a>
-      </div>
-      <div class="quick-contact-card fade-up fade-up-delay-1">
-        <div class="quick-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        </div>
-        <h4>邮件咨询</h4>
-        <div class="contact-val">sales@shuliyuan.com.cn</div>
-        <div class="contact-note">48小时内回复您的邮件</div>
-        <a href="mailto:sales@shuliyuan.com.cn" class="btn btn-secondary btn-sm" style="margin-top:16px;width:100%;justify-content:center">发送邮件</a>
-      </div>
-      <div class="quick-contact-card fade-up fade-up-delay-2">
-        <div class="quick-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <h4>在线留言</h4>
-        <div class="contact-val" style="font-size:13px;font-weight:600">填写下方留言表单</div>
-        <div class="contact-note">24小时内电话或邮件回复</div>
-        <a href="#contactForm" class="btn btn-primary btn-sm" style="margin-top:16px;width:100%;justify-content:center">立即留言</a>
-      </div>
-    </div>
-  </div>
-</section>
+
 
 <!-- ===== 客服微信 ===== -->
 <section class="wechat-section">
@@ -370,6 +524,237 @@
   </div>
 </section>
 
+
+
+
+<!-- ===== 快速联系方式 ===== -->
+<section class="section-pad-sm" style="background:var(--bg-white)">
+  <div class="container">
+    <div class="quick-contact-grid">
+      <div class="quick-contact-card fade-up">
+        <div class="quick-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <h4>电话咨询</h4>
+        <div class="contact-val">028-88417995</div>
+        <div class="contact-note">周一至周五 9:00 - 18:00</div>
+        <a href="tel:02888417995" class="btn btn-secondary btn-sm" style="margin-top:16px;width:100%;justify-content:center">立即拨打</a>
+      </div>
+      <div class="quick-contact-card fade-up fade-up-delay-1">
+        <div class="quick-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h4>邮件咨询</h4>
+        <div class="contact-val">sales@shuliyuan.com.cn</div>
+        <div class="contact-note">48小时内回复您的邮件</div>
+        <a href="mailto:sales@shuliyuan.com.cn" class="btn btn-secondary btn-sm" style="margin-top:16px;width:100%;justify-content:center">发送邮件</a>
+      </div>
+      <div class="quick-contact-card fade-up fade-up-delay-2">
+        <div class="quick-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h4>在线留言</h4>
+        <div class="contact-val" style="font-size:13px;font-weight:600">填写下方留言表单</div>
+        <div class="contact-note">24小时内电话或邮件回复</div>
+        <a href="#contactForm" class="btn btn-primary btn-sm" style="margin-top:16px;width:100%;justify-content:center">立即留言</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 经销商查询 ===== -->
+<section class="dealer-section" id="dealerSection">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">授权渠道</span>
+      <h2 class="section-title">经销<span>商查询</span></h2>
+      <div class="section-divider" style="margin:20px auto 20px"></div>
+      <p class="section-subtitle" style="margin:0 auto">查找离您最近的授权经销商，获取本地化服务与技术支持</p>
+    </div>
+
+    <!-- 搜索过滤栏 -->
+    <div class="dealer-header-wrap fade-up">
+      <div class="dealer-search-bar">
+        <input type="text" class="dealer-search-input" id="dealerSearch" placeholder="输入城市或经销商名称搜索...">
+        <select class="dealer-select" id="dealerRegion">
+          <option value="">全部区域</option>
+          <option value="华东">华东</option>
+          <option value="华南">华南</option>
+          <option value="华北">华北</option>
+          <option value="华中">华中</option>
+          <option value="西南">西南</option>
+          <option value="西北">西北</option>
+          <option value="东北">东北</option>
+        </select>
+        <select class="dealer-select" id="dealerType">
+          <option value="">全部类型</option>
+          <option value="auth">授权经销商</option>
+          <option value="partner">合作伙伴</option>
+        </select>
+      </div>
+      <div class="dealer-count" id="dealerCount">共 <strong>6</strong> 家经销商</div>
+    </div>
+
+    <!-- 经销商网格 -->
+    <div class="dealer-grid fade-up" id="dealerGrid">
+      <div class="dealer-card" data-region="华东" data-type="auth" data-search="上海 常旭精密轴承">
+        <div class="dealer-card-header">
+          <div class="dealer-name">上海常旭精密轴承有限公司</div>
+          <span class="dealer-badge auth">授权经销商</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>上海市闵北路88弄1-30号</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>021-56387567</span>
+        </div>
+        <div class="dealer-actions">
+          <a href="tel:021-56387567" class="dealer-btn tel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            电话咨询
+          </a>
+          <a href="https://uri.amap.com/search?keyword=上海市闵北路88弄" target="_blank" rel="noopener noreferrer" class="dealer-btn map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            查看地图
+          </a>
+        </div>
+      </div>
+
+      <div class="dealer-card" data-region="华东" data-type="partner" data-search="杭州 瑛睿机械科技">
+        <div class="dealer-card-header">
+          <div class="dealer-name">杭州瑛睿机械科技有限公司</div>
+          <span class="dealer-badge partner">合作伙伴</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>浙江省杭州市临安区青山湖街道科技大道2500号1幢6层601-3室</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>19980813227</span>
+        </div>
+        <div class="dealer-actions">
+          <a href="tel:19980813227" class="dealer-btn tel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            电话咨询
+          </a>
+          <a href="https://uri.amap.com/search?keyword=杭州市临安区青山湖街道科技大道2500号" target="_blank" rel="noopener noreferrer" class="dealer-btn map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            查看地图
+          </a>
+        </div>
+      </div>
+
+      <div class="dealer-card" data-region="华南" data-type="auth" data-search="厦门 东南宝智能科技">
+        <div class="dealer-card-header">
+          <div class="dealer-name">厦门东南宝智能科技有限公司</div>
+          <span class="dealer-badge auth">授权经销商</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>厦门市集美区杏林湾路496号1303单元</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>19381611448</span>
+        </div>
+        <div class="dealer-actions">
+          <a href="tel:19381611448" class="dealer-btn tel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            电话咨询
+          </a>
+          <a href="https://uri.amap.com/search?keyword=厦门市集美区杏林湾路496号" target="_blank" rel="noopener noreferrer" class="dealer-btn map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            查看地图
+          </a>
+        </div>
+      </div>
+
+      <div class="dealer-card" data-region="华北" data-type="partner" data-search="莱州 诚亚达商贸">
+        <div class="dealer-card-header">
+          <div class="dealer-name">莱州诚亚达商贸有限公司</div>
+          <span class="dealer-badge partner">合作伙伴</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>山东省烟台市莱州市程郭镇东岭路安邦名人家园13号楼904室</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>18353587927</span>
+        </div>
+        <div class="dealer-actions">
+          <a href="tel:18353587927" class="dealer-btn tel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            电话咨询
+          </a>
+          <a href="https://uri.amap.com/search?keyword=山东省烟台市莱州市程郭镇东岭路安邦名人家园" target="_blank" rel="noopener noreferrer" class="dealer-btn map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            查看地图
+          </a>
+        </div>
+      </div>
+
+      <div class="dealer-card" data-region="华北" data-type="partner" data-search="北矿科技">
+        <div class="dealer-card-header">
+          <div class="dealer-name">北矿科技股份有限公司</div>
+          <span class="dealer-badge partner">合作伙伴</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>北京市丰台区南四环西路188号18区23号楼4层</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>010-63299988</span>
+        </div>
+        <div class="dealer-actions">
+          <a href="tel:010-63299988" class="dealer-btn tel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            电话咨询
+          </a>
+          <a href="https://uri.amap.com/search?keyword=北京市丰台区南四环西路188号18区23号楼" target="_blank" rel="noopener noreferrer" class="dealer-btn map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            查看地图
+          </a>
+        </div>
+      </div>
+
+      <div class="dealer-card" data-region="西北" data-type="partner" data-search="西安 科峰智能">
+        <div class="dealer-card-header">
+          <div class="dealer-name">科峰智能科技（西安）有限公司</div>
+          <span class="dealer-badge partner">合作伙伴</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>陕西省西安市曲江新区芙蓉南路98号金地芙蓉世家41栋3单元102室</span>
+        </div>
+        <div class="dealer-info-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>029-85236528</span>
+        </div>
+        <div class="dealer-actions">
+          <a href="tel:029-85236528" class="dealer-btn tel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            电话咨询
+          </a>
+          <a href="https://uri.amap.com/search?keyword=西安市曲江新区芙蓉南路98号金地芙蓉世家" target="_blank" rel="noopener noreferrer" class="dealer-btn map">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            查看地图
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 空状态 -->
+    <div class="dealer-empty fade-up" id="dealerEmpty" style="display:none">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C41230" stroke-width="1.5" opacity="0.4"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>未找到匹配的经销商，请调整筛选条件</p>
+    </div>
+  </div>
+</section>
 <!-- ===== 联系信息 + 表单 ===== -->
 <section class="contact-section" id="contactFormSection">
   <div class="container">
@@ -537,41 +922,26 @@
 
 <!-- ===== 地图区域 ===== -->
 <div class="map-section">
-  <div class="map-wrap">
-    <!-- 地图装饰背景 -->
-    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid slice">
-      <!-- 网格线 -->
-      <defs>
-        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E6FDE" stroke-width="0.5"/>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)"/>
-      <!-- 道路模拟 -->
-      <line x1="0" y1="180" x2="1200" y2="180" stroke="#1E6FDE" stroke-width="3" opacity="0.4"/>
-      <line x1="600" y1="0" x2="600" y2="360" stroke="#1E6FDE" stroke-width="3" opacity="0.4"/>
-      <line x1="0" y1="90" x2="1200" y2="90" stroke="#1E6FDE" stroke-width="1.5" opacity="0.2"/>
-      <line x1="0" y1="270" x2="1200" y2="270" stroke="#1E6FDE" stroke-width="1.5" opacity="0.2"/>
-      <line x1="300" y1="0" x2="300" y2="360" stroke="#1E6FDE" stroke-width="1.5" opacity="0.2"/>
-      <line x1="900" y1="0" x2="900" y2="360" stroke="#1E6FDE" stroke-width="1.5" opacity="0.2"/>
-    </svg>
-
-    <!-- 地图标注 -->
-    <div class="map-placeholder">
-      <div class="map-pin" style="position:relative;width:40px;height:40px;background:var(--brand-red);border-radius:50% 50% 50% 0;transform:rotate(-45deg);margin:0 auto 24px;box-shadow:0 4px 20px rgba(196,18,48,0.4)">
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);width:14px;height:14px;background:white;border-radius:50%"></div>
+  <div class="map-wrap" id="mapContainer">
+    <div id="companyMap"></div>
+    <div class="map-info-overlay">
+      <div>
+        <div class="address-text">四川省成都市龙泉驿区成龙大道中段1118号中物国际</div>
+        <div class="address-note">蜀利元智能润滑器 总部</div>
       </div>
-      <div class="address">四川省成都市龙泉驿区成龙大道中段1118号中物国际</div>
-      <p style="margin-top:8px;color:var(--text-muted)">蜀利元智能润滑器 总部</p>
-      <a href="https://uri.amap.com/search?keyword=成都高新区" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="margin-top:20px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        高德地图导航
-      </a>
+      <div class="map-actions">
+        <a href="https://uri.amap.com/navigation?to=104.237,30.562,成都市龙泉驿区成龙大道中段1118号中物国际&mode=car&callnative=1" target="_blank" rel="noopener noreferrer" class="map-btn map-btn-nav">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          一键导航
+        </a>
+        <a href="https://uri.amap.com/marker?position=104.237,30.562&name=蜀利元智能润滑器&coordinate=gaode&callnative=1" target="_blank" rel="noopener noreferrer" class="map-btn map-btn-big">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          高德地图打开
+        </a>
+      </div>
     </div>
   </div>
 </div>
-
-<!-- ===== FAQ ===== -->
 <section class="faq-section">
   <div class="container">
     <div class="section-header fade-up">
@@ -653,7 +1023,7 @@
         </div>
         <p class="footer-desc">工业智能润滑解决方案专家，帮助工业企业实现精准润滑管理。</p>
       </div>
-      <div class="footer-col"><h5>快速导航</h5><div class="footer-links"><a href="index.html">首页</a><a href="products.html">产品中心</a><a href="solutions.html">解决方案</a><a href="contact.html">联系我们</a></div></div>
+      <div class="footer-col"><h5>快速导航</h5><div class="footer-links"><a href="index.html">首页</a><a href="products.html">产品中心</a><a href="knowledge.html">技术知识</a><a href="solutions.html">解决方案</a><a href="contact.html">联系我们</a></div></div>
       <div class="footer-col"><h5>产品服务</h5><div class="footer-links"><a href="products.html">S500H智能润滑器</a><a href="solutions.html">行业解决方案</a><a href="contact.html">技术咨询</a></div></div>
       <div class="footer-col"><h5>联系我们</h5><div class="footer-contact"><div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>028-88417995</span></div><div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>sales@shuliyuan.com.cn</span></div><div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>四川省成都市高新区</span></div></div></div>
     </div>
@@ -668,6 +1038,59 @@
 
 <script src="assets/js/main.js"></script>
 <script>
+// 动态地图初始化
+(function() {
+  var mapContainer = document.getElementById('companyMap');
+  if (!mapContainer) return;
+
+  // 蜀利元总部坐标 (成都龙泉驿成龙大道中段1118号中物国际)
+  var lat = 30.562;
+  var lng = 104.237;
+
+  var map = L.map('companyMap', {
+    center: [lat, lng],
+    zoom: 15,
+    zoomControl: true,
+    attributionControl: false
+  });
+
+  // 使用高德地图瓦片 (无需API Key)
+  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    subdomains: ['1', '2', '3', '4'],
+    maxZoom: 18,
+    minZoom: 3
+  }).addTo(map);
+
+  // 自定义红色标记图标
+  var markerIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div style="position:relative;width:36px;height:48px">' +
+          '<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:36px;height:36px;background:#C41230;border-radius:50% 50% 50% 0;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 16px rgba(196,18,48,0.5);border:3px solid white"></div>' +
+          '<div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:10px;height:10px;background:white;border-radius:50%"></div>' +
+          '</div>',
+    iconSize: [36, 48],
+    iconAnchor: [18, 48],
+    popupAnchor: [0, -48]
+  });
+
+  var marker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+
+  // 点击标记弹出信息
+  marker.bindPopup(
+    '<div style="text-align:center;min-width:180px">' +
+    '<strong style="font-size:15px;color:#C41230">蜀利元智能润滑器</strong><br>' +
+    '<span style="font-size:12px;color:#666">总部</span><br>' +
+    '<span style="font-size:12px;color:#333">四川省成都市龙泉驿区<br>成龙大道中段1118号中物国际</span><br>' +
+    '<a href="https://uri.amap.com/navigation?to=104.237,30.562,成都市龙泉驿区成龙大道中段1118号&mode=car&callnative=1" target="_blank" style="display:inline-block;margin-top:8px;padding:6px 16px;background:#C41230;color:white;border-radius:4px;text-decoration:none;font-size:12px;font-weight:600">导航到这里</a>' +
+    '</div>'
+  );
+
+  // 页面resize时刷新地图
+  window.addEventListener('resize', function() {
+    map.invalidateSize();
+  });
+})();
+
 // FAQ折叠
 document.querySelectorAll('.faq-q').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -677,6 +1100,48 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     if (!isOpen) item.classList.add('open');
   });
 });
+
+// 经销商筛选
+(function() {
+  const searchInput = document.getElementById('dealerSearch');
+  const regionSelect = document.getElementById('dealerRegion');
+  const typeSelect = document.getElementById('dealerType');
+  const grid = document.getElementById('dealerGrid');
+  const empty = document.getElementById('dealerEmpty');
+  const countEl = document.getElementById('dealerCount');
+  const cards = grid ? grid.querySelectorAll('.dealer-card') : [];
+
+  function filterDealers() {
+    const searchTerm = (searchInput?.value || '').toLowerCase().trim();
+    const region = regionSelect?.value || '';
+    const type = typeSelect?.value || '';
+    let visible = 0;
+
+    cards.forEach(card => {
+      const searchData = (card.getAttribute('data-search') || '').toLowerCase();
+      const cardRegion = card.getAttribute('data-region') || '';
+      const cardType = card.getAttribute('data-type') || '';
+
+      const matchSearch = !searchTerm || searchData.includes(searchTerm);
+      const matchRegion = !region || cardRegion === region;
+      const matchType = !type || cardType === type;
+
+      if (matchSearch && matchRegion && matchType) {
+        card.style.display = '';
+        visible++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (countEl) countEl.innerHTML = '共 <strong>' + visible + '</strong> 家经销商';
+    if (empty) empty.style.display = visible === 0 ? '' : 'none';
+  }
+
+  if (searchInput) searchInput.addEventListener('input', filterDealers);
+  if (regionSelect) regionSelect.addEventListener('change', filterDealers);
+  if (typeSelect) typeSelect.addEventListener('change', filterDealers);
+})();
 
 // 表单成功处理
 const form = document.getElementById('contactForm');

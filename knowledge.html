@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="蜀利元技术知识 - 工业润滑技术参数解读、选型指南、维护要点，助您深入了解智能润滑">
+  <title>技术知识 - 润滑技术解读 | 蜀利元</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23C41230'/><text y='22' x='5' font-size='18' fill='white' font-weight='bold'>蜀</text></svg>">
+  <style>
+    .knowledge-hero {
+      padding: 100px 0 48px;
+      background: linear-gradient(165deg, #0D1117 0%, #1a1f2e 100%);
+      text-align: center;
+    }
+    .knowledge-hero h1 { color: #fff; margin-bottom: 20px; }
+    .knowledge-hero h1 span { color: var(--brand-red); }
+    .knowledge-hero p { color: rgba(255,255,255,0.6); font-size: 16px; max-width: 600px; margin: 0 auto; }
+
+    .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .knowledge-card {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      transition: all 300ms;
+    }
+    .knowledge-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: transparent;
+    }
+    .kc-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+    .kc-icon.red { background: rgba(196,18,48,0.08); color: var(--brand-red); }
+    .kc-icon.blue { background: rgba(30,111,222,0.08); color: var(--brand-blue); }
+    .knowledge-card h4 { font-size: 18px; margin-bottom: 10px; }
+    .knowledge-card p { font-size: 14px; color: var(--text-muted); line-height: 1.75; }
+
+    .faq-list {
+      max-width: 780px;
+      margin: 48px auto 0;
+    }
+    .faq-item {
+      background: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 18px 24px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .faq-q::after {
+      content: '+';
+      font-size: 20px;
+      color: var(--brand-red);
+      font-weight: 400;
+      transition: transform 300ms;
+    }
+    .faq-item.open .faq-q::after { content: '\2212'; }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 400ms ease, padding 400ms ease;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 24px 20px; }
+    .faq-a p { font-size: 14px; color: var(--text-muted); line-height: 1.8; }
+
+    /* 注油量计算 */
+    .precision-section { padding: 64px 0 56px; background: var(--bg-white); }
+    
+    /* === 精准润滑主卡片 === */
+    .precision-master {
+      max-width: 980px; margin: 0 auto 24px;
+      background: #FFF; border: 1px solid #E8ECF2;
+      border-radius: var(--radius-lg); overflow: hidden;
+      display: grid; grid-template-columns: 35% 1fr;
+    }
+    /* 左栏：理论区（初次+二次） */
+    .pm-theory {
+      background: #F8FAFD; padding: 28px 28px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .pm-theory-block { }
+    .pm-theory-block .pm-badge {
+      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      padding: 3px 10px; border-radius: 3px; margin-bottom: 10px;
+    }
+    .pm-badge.blue { background: rgba(30,111,222,0.10); color: var(--brand-blue); }
+    .pm-badge.red { background: rgba(196,18,48,0.10); color: var(--brand-red); }
+    .pm-theory-block h4 { font-size: 14px; margin: 0 0 10px; color: var(--text-primary); font-weight: 700; }
+    .pm-item {
+      display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;
+    }
+    .pm-item:last-child { margin-bottom: 0; }
+    .pm-dot {
+      width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 7px;
+    }
+    .pm-dot.blue { background: var(--brand-blue); }
+    .pm-dot.red { background: var(--brand-red); }
+    .pm-item-content { font-size: 12px; color: #475569; line-height: 1.65; }
+    .pm-item-content strong { color: var(--text-primary); font-size: 13px; }
+    .pm-percent { font-weight: 800; font-size: 15px; }
+    .pm-percent.blue { color: var(--brand-blue); }
+    .pm-percent.red { color: var(--brand-red); }
+    .pm-formula-mini {
+      background: #FFFBEB; border: 1px solid #FDE68A;
+      border-radius: 4px; padding: 8px 10px; margin: 6px 0 2px;
+    }
+    .pm-formula-mini .m-eq {
+      font-family: 'Georgia','Times New Roman',serif; font-size: 12px;
+      color: var(--text-primary); margin-bottom: 2px; text-align: center;
+    }
+    .pm-formula-mini .m-eq span { font-weight: 700; }
+    .pm-formula-mini .m-eq .mc { color: var(--brand-red); }
+    .pm-formula-mini .m-note { font-size: 10px; color: var(--text-muted); text-align: center; }
+    .pm-sep { height: 1px; background: #E2E8F0; }
+
+    /* 右栏：计算器 */
+    .pm-calc { padding: 28px 32px; }
+    .pm-calc .pm-ctitle {
+      font-size: 13px; font-weight: 700; color: var(--text-primary);
+      margin-bottom: 16px; text-align: center;
+    }
+    .pm-calc .pm-ctitle span { color: var(--brand-red); }
+    .pm-formula {
+      display: flex; align-items: baseline; justify-content: center; gap: 5px;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px dashed #E2E8F0;
+    }
+    .pm-formula .fv {
+      font-size: 28px; font-weight: 800; font-family: 'Georgia','Times New Roman',serif;
+      font-style: italic; line-height: 1; color: #1E293B;
+    }
+    .pm-formula .feq { font-size: 20px; color: #CBD5E1; font-weight: 300; }
+    .pm-formula .fco { font-size: 28px; font-weight: 800; color: var(--brand-red); font-family: 'Georgia','Times New Roman',serif; }
+    .pm-formula .fmu { font-size: 16px; color: #CBD5E1; font-weight: 300; }
+    .pm-flabel { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 16px; }
+    .pm-flabel i { font-style: normal; font-weight: 700; }
+    .pm-flabel .i-d { color: var(--brand-red); }
+    .pm-flabel .i-b { color: var(--brand-blue); }
+    .pm-calc .calc-row {
+      display: flex; gap: 8px; align-items: flex-end; margin-bottom: 8px;
+    }
+    .pm-calc .calc-field { flex: 1; min-width: 0; }
+    .pm-calc .calc-field.wide { flex: 2; }
+    .pm-calc .calc-field label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      margin-bottom: 4px; white-space: nowrap;
+    }
+    .pm-calc .calc-field label .calc-var { font-style: italic; font-family: 'Georgia','Times New Roman',serif; }
+    .pm-calc .calc-var-d { color: var(--brand-red); }
+    .pm-calc .calc-var-b { color: var(--brand-blue); }
+    .pm-calc .calc-unit { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+    .pm-calc .calc-input, .pm-calc .calc-select {
+      width: 100%; height: 34px; padding: 0 8px;
+      border: 1.5px solid #E0E4EA; border-radius: 4px;
+      font-size: 13px; color: var(--text-primary); outline: none;
+      transition: border-color 200ms; background: #fff;
+      -webkit-appearance: none; appearance: none;
+    }
+    .pm-calc .calc-select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; padding-right: 22px; }
+    .pm-calc .calc-input:focus, .pm-calc .calc-select:focus { border-color: var(--brand-blue); }
+    .pm-calc .calc-input.input-d:focus { border-color: var(--brand-red); }
+    .pm-calc .calc-btn {
+      height: 34px; padding: 0 20px;
+      background: var(--brand-red); color: #fff; border-radius: 4px;
+      font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+      transition: opacity 200ms; flex-shrink: 0;
+    }
+    .pm-calc .calc-btn:hover { opacity: 0.9; }
+    .pm-calc .calc-result-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+      opacity: 0; transform: translateY(6px); transition: all 300ms;
+    }
+    .pm-calc .calc-result-grid.show { opacity: 1; transform: translateY(0); }
+    .pm-calc .calc-res-card {
+      background: #F0FDF4; border: 1px solid #BBF7D0;
+      border-radius: 4px; padding: 8px 10px; text-align: center;
+    }
+    .pm-calc .calc-res-card.highlight { background: rgba(196,18,48,0.05); border-color: rgba(196,18,48,0.2); }
+    .pm-calc .calc-res-val { font-size: 16px; font-weight: 800; color: #166534; line-height: 1.2; }
+    .pm-calc .calc-res-card.highlight .calc-res-val { color: var(--brand-red); }
+    .pm-calc .calc-res-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .pm-calc .calc-res-full {
+      display: flex; align-items: center; gap: 10px;
+      background: #FFF7ED; border: 1px solid #FED7AA;
+      border-radius: 4px; padding: 10px 14px; margin-top: 6px;
+    }
+    .pm-calc .calc-res-full .calc-res-val { font-size: 18px; color: #C2410C; }
+
+    /* 底部视觉行 */
+    .preview-row {
+      max-width: 980px; margin: 20px auto 0;
+      display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start;
+    }
+    .preview-row .bearing-img { width: 100%; height: auto; border-radius: var(--radius-md); }
+    .preview-info { display: flex; flex-direction: column; gap: 10px; }
+    .example-detail {
+      background: #FFF; border: 1px solid #E2E8F0;
+      border-radius: var(--radius-md); padding: 16px 20px;
+    }
+    .example-detail .ed-title {
+      font-size: 12px; font-weight: 700; color: var(--brand-blue);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+    }
+    .ed-title::before { content: '📐'; font-size: 13px; }
+    .ed-step {
+      font-size: 12px; color: #475569; line-height: 1.7;
+      margin-bottom: 2px;
+    }
+    .ed-step .ed-val { font-weight: 800; color: var(--brand-red); }
+    .ed-result {
+      margin-top: 6px; padding-top: 6px;
+      border-top: 1px dashed #E2E8F0;
+      display: flex; align-items: baseline; gap: 6px;
+    }
+    .ed-result .ed-main { font-size: 14px; color: #334155; }
+    .ed-result .ed-main strong { font-size: 22px; font-weight: 800; color: var(--brand-red); }
+    .ed-result .ed-sub { font-size: 11px; color: var(--text-muted); }
+    .precision-conclusion {
+      font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0;
+      padding: 10px 14px;
+      background: #FFF7ED; border-radius: var(--radius-sm);
+      border-left: 3px solid var(--brand-red);
+    }
+    .precision-conclusion span { color: var(--brand-red); font-weight: 700; }
+
+    /* 移动端 */
+    @media(max-width:768px){
+      .precision-section { padding: 48px 0; }
+      .precision-master { grid-template-columns: 1fr; }
+      .pm-theory { padding: 20px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .pm-sep { display: none; }
+      .pm-calc { padding: 18px 16px; }
+      .pm-formula .fv, .pm-formula .fco { font-size: 22px; }
+      .pm-formula .feq { font-size: 16px; }
+      .pm-formula .fmu { font-size: 13px; }
+      .preview-row { grid-template-columns: 1fr; gap: 14px; }
+      .preview-row .bearing-img { max-width: 200px; margin: 0 auto; }
+      .knowledge-grid { grid-template-columns: 1fr; }
+      .knowledge-hero { padding: 100px 0 56px; }
+      .nlgi-table-wrap { padding: 22px; }
+    }
+    @media(max-width:640px){
+      .precision-section { padding: 40px 0; }
+      .pm-theory { grid-template-columns: 1fr; }
+      .pm-calc { padding: 16px 12px; }
+      .pm-formula .fv, .pm-formula .fco { font-size: 20px; }
+      .pm-formula .feq { font-size: 14px; }
+      .pm-formula .fmu { font-size: 12px; }
+      .grease-intro-text { text-align: left; font-size: 14px; }
+      .nlgi-table-wrap { padding: 18px; }
+      .nlgi-table { font-size: 12px; }
+      .nlgi-table th, .nlgi-table td { padding: 6px 4px; }
+      .pm-calc .calc-row { flex-wrap: wrap; gap: 6px; }
+      .pm-calc .calc-field { min-width: calc(50% - 3px); }
+      .pm-calc .calc-field.wide { min-width: 100%; }
+      .pm-calc .calc-btn { width: 100%; margin-top: 2px; }
+      .pm-calc .calc-result-grid { grid-template-columns: repeat(2, 1fr); }
+      .pm-calc .calc-res-full { flex-direction: column; gap: 3px; text-align: center; }
+    }
+
+    /* 润滑脂技术参数解读 */
+    .grease-knowledge-section { padding: 56px 0; background: var(--bg-white); }
+    .grease-intro-wrap {
+      max-width: 780px; margin: 0 auto;
+    }
+    .grease-intro-text { font-size: 15px; color: var(--text-muted); line-height: 1.9; text-align: center; }
+    .grease-intro-text p { margin-bottom: 10px; }
+    .grease-intro-text p:last-of-type { margin-bottom: 0; }
+    .grease-tags-row {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .grease-tag {
+      font-size: 12px; font-weight: 600; padding: 6px 18px; border-radius: 20px;
+    }
+    .grease-tag.red { color: var(--brand-red); background: rgba(196,18,48,0.08); }
+    .grease-tag.blue { color: var(--brand-blue); background: rgba(30,111,222,0.08); }
+    .nlgi-table-wrap {
+      max-width: 680px; margin: 32px auto 0;
+      background: var(--bg-gray);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .nlgi-table-wrap h4 { font-size: 16px; margin-bottom: 16px; text-align: center; color: var(--text-primary); }
+    .nlgi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .nlgi-table th { background: var(--brand-red); color: white; padding: 10px 8px; text-align: center; font-weight: 700; font-size: 12px; }
+    .nlgi-table th:first-child { border-radius: 6px 0 0 0; }
+    .nlgi-table th:last-child { border-radius: 0 6px 0 0; }
+    .nlgi-table td { padding: 8px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.06); background: white; }
+    .nlgi-table tr:last-child td { border-bottom: none; }
+    .nlgi-table tr:last-child td:first-child { border-radius: 0 0 0 6px; }
+    .nlgi-table tr:last-child td:last-child { border-radius: 0 0 6px 0; }
+    .nlgi-table .nlgi-highlight { background: rgba(196,18,48,0.06); font-weight: 700; color: var(--brand-red); }
+    .nlgi-table .nlgi-appearance { font-size: 12px; color: var(--text-muted); }
+
+    /* 板块间距收紧 */
+    .section-pad { padding: 56px 0; }
+    .knowledge-grid { margin-top: 36px; }
+    .faq-list { margin-top: 36px; }
+    @media(max-width:767px){
+      .section-pad { padding: 40px 0; }
+      .grease-knowledge-section { padding: 36px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ===== 导航栏 ===== -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="蜀利元智能润滑器" class="logo-img" height="40">
+    </a>
+    <nav class="navbar-nav">
+      <a href="index.html" class="nav-link">首页</a>
+      <a href="products.html" class="nav-link">产品中心</a>
+      <a href="knowledge.html" class="nav-link" style="color:var(--brand-red)">技术知识</a>
+      <a href="solutions.html" class="nav-link">解决方案</a>
+      <a href="contact.html" class="nav-link">联系我们</a>
+    </nav>
+    <div class="navbar-cta">
+      <a href="http://shuliyuan.com.cn/" target="_blank" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        控制中心
+      </a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" class="nav-link">首页</a>
+  <a href="products.html" class="nav-link">产品中心</a>
+  <a href="knowledge.html" class="nav-link">技术知识</a>
+  <a href="solutions.html" class="nav-link">解决方案</a>
+  <a href="contact.html" class="nav-link">联系我们</a>
+  <a href="http://shuliyuan.com.cn/" target="_blank" class="btn btn-primary">控制中心</a>
+</div>
+
+<!-- ===== Hero ===== -->
+<section class="knowledge-hero">
+  <div class="container">
+    <span class="section-label" style="color:var(--brand-red)">技术知识</span>
+    <h1>润滑技术<span>知识库</span></h1>
+    <p>从基础概念到实践应用，助您掌握智能润滑核心技术要点</p>
+  </div>
+</section>
+
+<!-- ===== 精确润滑科学 ===== -->
+<section class="precision-section">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">精确润滑</span>
+      <h2 class="section-title">注油量<span>计算</span></h2>
+      <div class="section-divider" style="margin:20px auto 20px"></div>
+      <p class="section-subtitle" style="margin:0 auto">润滑是一门精确的科学，每一滴油脂都有数学逻辑</p>
+    </div>
+    <!-- 主卡片：理论（左）+ 计算器（右） -->
+    <div class="precision-master fade-up">
+      <!-- 左栏：理论区 -->
+      <div class="pm-theory">
+        <div class="pm-theory-block">
+          <span class="pm-badge blue">初次润滑</span>
+          <h4>轴承初次润滑</h4>
+          <div class="pm-item">
+            <span class="pm-dot blue"></span>
+            <div class="pm-item-content">
+              <strong>开式轴承</strong><br>
+              润滑脂填充量 <span class="pm-percent blue">100%</span>，完全填充
+            </div>
+          </div>
+          <div class="pm-item">
+            <span class="pm-dot blue"></span>
+            <div class="pm-item-content">
+              <strong>轴承座</strong><br>
+              两侧填充 <span class="pm-percent blue">40%</span>，外圈填充 <span class="pm-percent blue">20%</span>
+            </div>
+          </div>
+        </div>
+        <div class="pm-sep"></div>
+        <div class="pm-theory-block">
+          <span class="pm-badge red">二次润滑（补充加脂）</span>
+          <div class="pm-item">
+            <span class="pm-dot red"></span>
+            <div class="pm-item-content">
+              <strong>两侧填充</strong>
+              <div class="pm-formula-mini">
+                <div class="m-eq">Gp = <span class="mc">0.005</span> &times; D &times; B</div>
+                <div class="m-note">D=外径(mm) ｜ B=宽度(mm)</div>
+              </div>
+            </div>
+          </div>
+          <div class="pm-item">
+            <span class="pm-dot red"></span>
+            <div class="pm-item-content">
+              <strong>单侧填充</strong>
+              <div class="pm-formula-mini">
+                <div class="m-eq">Gp = <span class="mc">0.002</span> &times; D &times; B</div>
+                <div class="m-note">单侧系数为两侧的一半</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 右栏：计算器 -->
+      <div class="pm-calc">
+        <div class="pm-ctitle">补充润滑量<span>快速计算</span></div>
+        <div class="pm-formula">
+          <span class="fv">Gp</span>
+          <span class="feq">=</span>
+          <span class="fco">0.005</span>
+          <span class="fmu">&times;</span>
+          <span class="fv" style="color:var(--brand-red)">D</span>
+          <span class="fmu">&times;</span>
+          <span class="fv" style="color:var(--brand-blue)">B</span>
+        </div>
+        <p class="pm-flabel"><i class="i-d">D</i>=外径(mm) &nbsp;｜&nbsp; <i class="i-b">B</i>=宽度(mm)</p>
+        <div class="calc-row">
+          <div class="calc-field wide">
+            <label>轴承型号</label>
+            <select class="calc-select" id="calcModel" onchange="onModelChange()">
+              <option value="">-- 选择或手动输入 --</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-field">
+            <label><span class="calc-var calc-var-d">D</span> <span class="calc-unit">外径 mm</span></label>
+            <input type="number" class="calc-input input-d" id="calcD" placeholder="外径" min="1" step="0.1" oninput="calcGrease()">
+          </div>
+          <div class="calc-field">
+            <label><span class="calc-var calc-var-b">B</span> <span class="calc-unit">宽度 mm</span></label>
+            <input type="number" class="calc-input input-b" id="calcB" placeholder="宽度" min="1" step="0.1" oninput="calcGrease()">
+          </div>
+          <div class="calc-field">
+            <label>润滑方式</label>
+            <select class="calc-select" id="calcMethod" onchange="calcGrease()">
+              <option value="both">两侧</option>
+              <option value="one">单侧</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label><span class="calc-unit">间隔 N(天)</span></label>
+            <input type="number" class="calc-input" id="calcN" value="30" min="1" step="1" oninput="calcGrease()">
+          </div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-field">
+            <label>转速</label>
+            <select class="calc-select" id="calcRPM" onchange="calcGrease()">
+              <option value="低">低(&lt;900)</option>
+              <option value="中" selected>中(900-1500)</option>
+              <option value="高">高(1500-2000)</option>
+              <option value="很高">很高(&gt;2000)</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label>运行温度</label>
+            <select class="calc-select" id="calcTemp" onchange="calcGrease()">
+              <option value="低">低(47-63℃)</option>
+              <option value="中" selected>中(63-78℃)</option>
+              <option value="高">高(78-93℃)</option>
+              <option value="超高">超高(93-107℃)</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label>载荷</label>
+            <select class="calc-select" id="calcLoad" onchange="calcGrease()">
+              <option value="低" selected>低(C/P&gt;15)</option>
+              <option value="中">中(C/P=8-15)</option>
+              <option value="高">高(C/P=4-8)</option>
+              <option value="很高">很高(C/P&lt;4)</option>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label>污染</label>
+            <select class="calc-select" id="calcContam" onchange="calcGrease()">
+              <option value="低" selected>低</option>
+              <option value="中">中</option>
+              <option value="高">高</option>
+            </select>
+          </div>
+          <button class="calc-btn" onclick="calcGrease()">计算</button>
+        </div>
+        <div class="calc-result-grid" id="calcResultGrid">
+          <div class="calc-res-card highlight">
+            <div class="calc-res-val" id="calcGpVal">—</div>
+            <div class="calc-res-label">每次加脂 Gp (g)</div>
+          </div>
+          <div class="calc-res-card">
+            <div class="calc-res-val" id="calcCoefVal">—</div>
+            <div class="calc-res-label">总修正系数</div>
+          </div>
+          <div class="calc-res-card">
+            <div class="calc-res-val" id="calcDailyVal">—</div>
+            <div class="calc-res-label">日用量 (g/天)</div>
+          </div>
+        </div>
+        <div class="calc-res-full" id="calcMonthlyRow" style="display:none">
+          <span style="font-size:11px;color:var(--text-muted)">建议间隔 <strong id="calcSuggestN" style="color:#C2410C">—</strong>天 ｜ 月用量</span>
+          <span class="calc-res-val" id="calcMonthlyVal">—</span> <span style="font-size:11px;color:var(--text-muted)">g/月 (按 <strong id="calcDaysVal">30</strong> 天)</span>
+        </div>
+      </div>
+    </div>
+    <!-- 底部：示意图 + 示例 + 结论 -->
+    <div class="preview-row fade-up">
+      <img src="assets/images/bearing-cross-section.png" alt="轴承剖面图" class="bearing-img">
+      <div class="preview-info">
+        <div class="example-detail">
+          <div class="ed-title">计算示例 · 6330 C3</div>
+          <div class="ed-step">D = 225mm ｜ B = 35mm</div>
+          <div class="ed-step">Gp = 225 &times; 35 &times; 0.005 = <span class="ed-val">39g</span></div>
+          <div class="ed-result">
+            <div class="ed-main">日均加脂量 <strong>0.65g</strong></div>
+            <div class="ed-sub">39g &divide; 60 天（2个月间隔）</div>
+          </div>
+        </div>
+        <p class="precision-conclusion">人力无法实现每天精确到小数点的注油，<span>必须依靠智能硬件</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 润滑脂技术参数解读 ===== -->
+<section class="grease-knowledge-section" style="background:var(--bg-gray)">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">技术参数</span>
+      <h2 class="section-title">润滑脂<span>技术参数解读</span></h2>
+      <div class="section-divider" style="margin:20px auto 20px"></div>
+      <p class="section-subtitle" style="margin:0 auto">了解润滑脂核心指标，科学选择适合设备的润滑方案</p>
+    </div>
+
+    <!-- 引言 + NLGI稠度表 -->
+    <div class="grease-intro-wrap fade-up">
+      <div class="grease-intro-text">
+        <p>要选择合适的润滑脂，需要具备一些基础知识以懂得技术数据。S500H智能润滑器兼容NLGI 3#及以下各类常规工业油脂，以下是对关键润滑脂技术参数的专业解读。</p>
+        <p>正确理解这些参数，有助于根据设备工况、环境条件和润滑要求，选择最优润滑脂配方，配合S500H的精准注油系统，实现设备润滑效果最大化。</p>
+      </div>
+      <div class="grease-tags-row">
+        <span class="grease-tag red">NLGI 000~3# 适用</span>
+        <span class="grease-tag blue">锂基脂/钙基脂兼容</span>
+      </div>
+    </div>
+    <div class="nlgi-table-wrap fade-up">
+      <h4>NLGI 稠度等级表</h4>
+      <table class="nlgi-table">
+        <thead>
+          <tr>
+            <th>NLGI 编号</th>
+            <th>针入度 (10⁻¹mm)</th>
+            <th>外观状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>000</td><td>445-475</td><td class="nlgi-appearance">极强流动性</td></tr>
+          <tr><td>00</td><td>400-430</td><td class="nlgi-appearance">流体</td></tr>
+          <tr><td>0</td><td>355-385</td><td class="nlgi-appearance">半流体</td></tr>
+          <tr><td>1</td><td>310-340</td><td class="nlgi-appearance">非常软</td></tr>
+          <tr class="nlgi-highlight"><td>2</td><td>265-295</td><td class="nlgi-appearance">软（最常用）</td></tr>
+          <tr class="nlgi-highlight"><td>3</td><td>220-250</td><td class="nlgi-appearance">中等硬度</td></tr>
+          <tr><td>4</td><td>175-205</td><td class="nlgi-appearance">硬</td></tr>
+          <tr><td>5</td><td>130-160</td><td class="nlgi-appearance">非常硬</td></tr>
+          <tr><td>6</td><td>85-115</td><td class="nlgi-appearance">极硬</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:12px">高亮行为轴承常用润滑脂稠度等级</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== 知识主题 ===== -->
+<section class="section-pad" style="background:var(--bg-gray)">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">知识主题</span>
+      <h2 class="section-title">润滑技术<span>核心概念</span></h2>
+      <div class="section-divider" style="margin:20px auto 20px"></div>
+      <p class="section-subtitle" style="margin:0 auto">理解这些关键参数，让选型与维护更科学</p>
+    </div>
+
+    <div class="knowledge-grid fade-up">
+      <div class="knowledge-card">
+        <div class="kc-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h4>NLGI稠度等级</h4>
+        <p>稠度衡量润滑脂的硬度，从000级（液态）到6级（极硬）。工业轴承常用NLGI 1、2、3级——太软易泄漏，太硬阻力大。选择合适的稠度是选型第一步。</p>
+      </div>
+
+      <div class="knowledge-card">
+        <div class="kc-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+        </div>
+        <h4>温度与粘度</h4>
+        <p>润滑脂性能高度依赖温度：低温下油脂变硬可能导致贫油，高温下加速氧化降解。基础油粘度决定了油膜承载能力——原则是"轻载低粘、重载高粘"。</p>
+      </div>
+
+      <div class="knowledge-card">
+        <div class="kc-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h4>补充润滑周期</h4>
+        <p>正确的注油周期和注油量是延长轴承寿命的关键。周期太短浪费润滑脂，太长导致贫油磨损。需综合轴承转速、负载、温度、环境等因素计算。</p>
+      </div>
+
+      <div class="knowledge-card">
+        <div class="kc-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h4>抗腐蚀与抗水性</h4>
+        <p>潮湿、水淋、腐蚀性环境中，润滑脂必须具备良好的抗水冲刷能力和防腐蚀保护。Emcor测试（0~5级）是衡量防腐蚀性能的标准方法。</p>
+      </div>
+
+      <div class="knowledge-card">
+        <div class="kc-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <h4>极压（EP）性能</h4>
+        <p>重载设备（如矿山、钢铁行业）需要极压润滑脂。4球焊接荷载测试是衡量EP性能的核心方法——极压润滑脂典型值超过2600N。</p>
+      </div>
+
+      <div class="knowledge-card">
+        <div class="kc-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <h4>智能润滑 vs 传统润滑</h4>
+        <p>传统人工注油难以精确控制周期和剂量，容易过量或不足。智能润滑器按预设参数自动注油，搭配远程监控平台实时掌握设备状态，提升管理效率。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 常见问题 FAQ ===== -->
+<section class="section-pad" style="background:var(--bg-white)">
+  <div class="container">
+    <div class="section-header fade-up">
+      <span class="section-label">FAQ</span>
+      <h2 class="section-title">常见<span>技术问题</span></h2>
+      <div class="section-divider" style="margin:20px auto 20px"></div>
+    </div>
+
+    <div class="faq-list fade-up">
+      <div class="faq-item">
+        <div class="faq-q">S500H智能润滑器适用于哪些类型的润滑脂？</div>
+        <div class="faq-a"><p>S500H兼容NLGI 000#~3#的各类常规工业润滑脂，包括锂基脂、钙基脂、复合锂基脂、聚脲脂等。最大输出压力达10Bar，能够轻松应对中高稠度润滑脂的输送。建议使用前进行润滑脂兼容性测试。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">如何确定设备的注油周期和每次注油量？</div>
+        <div class="faq-a"><p>注油周期和注油量需根据轴承类型、转速、负载、工作温度等因素综合计算。通常原则是：高温高负载工况缩短注油周期，低速重载适当增加单次注油量。可联系我们的技术团队获取针对您设备的精确润滑方案。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">S500H能否在粉尘、高温或潮湿等恶劣工况下使用？</div>
+        <div class="faq-a"><p>可以。S500H采用IP65防护等级设计，具备优良的防尘防水能力。工作温度范围-20°C至+60°C（配合合适润滑脂可扩展）。对于极端工况（如钢厂高温区），建议联系我们获取针对性的安装和保护方案。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">一个S500H可以同时给多个润滑点供油吗？</div>
+        <div class="faq-a"><p>S500H设计为单点润滑器。如需同时润滑多个点位，可通过配置分配器（递进式或容积式）实现多点供油。具体方案需评估各润滑点的阻力差异、距离等因素，建议联系我们进行系统设计。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">远程监控平台如何接入？是否需要额外费用？</div>
+        <div class="faq-a"><p>S500H内置4G通信模组，设备通电后自动连接云平台。您通过Web端或手机APP即可查看设备运行状态、历史数据、告警信息等。平台基础功能免费使用，高级分析功能可根据需求开通。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">润滑脂是否需要在特定条件下储存？保质期多长？</div>
+        <div class="faq-a"><p>润滑脂应储存在阴凉干燥处，避免阳光直射和极端温度，推荐储存温度0°C~40°C。不同配方润滑脂保质期不同，一般在1~5年之间。过期的润滑脂可能发生分油、氧化、稠度变化等问题，使用前建议检查外观和状态。</p></div>
+      </div>
+    </div>
+
+    <p style="text-align:center;margin-top:36px;color:var(--text-muted);font-size:14px">没有找到您关心的问题？<a href="contact.html" style="color:var(--brand-red);font-weight:600">联系我们</a>，为您详细解答。</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo navbar-logo">
+          <img src="assets/images/logo.png" alt="蜀利元智能润滑器" class="logo-img" height="40">
+        </div>
+        <p class="footer-desc">工业智能润滑解决方案专家，帮助工业企业实现精准润滑管理，降低维护成本，提升设备可靠性。</p>
+      </div>
+      <div class="footer-col"><h5>快速导航</h5><div class="footer-links"><a href="index.html">首页</a><a href="products.html">产品中心</a><a href="knowledge.html">技术知识</a><a href="solutions.html">解决方案</a><a href="contact.html">联系我们</a></div></div>
+      <div class="footer-col"><h5>产品服务</h5><div class="footer-links"><a href="products.html">S500H智能润滑器</a><a href="knowledge.html">技术知识</a><a href="solutions.html">行业解决方案</a><a href="contact.html">技术咨询</a></div></div>
+      <div class="footer-col"><h5>联系我们</h5><div class="footer-contact"><div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>028-88417995</span></div><div class="contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>sales@shuliyuan.com.cn</span></div></div></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2024 蜀利元智能润滑器. 保留所有权利.</span><span>精研流动，重塑润滑</span></div>
+  </div>
+</footer>
+
+<div class="float-consult">
+  <a href="http://shuliyuan.com.cn/" target="_blank" class="float-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="float-tooltip">控制中心</span></a>
+  <a href="tel:02888417995" class="float-btn blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="float-tooltip">电话咨询</span></a>
+</div>
+
+<script src="assets/js/main.js"></script>
+<script>
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    q.parentElement.classList.toggle('open');
+  });
+});
+
+/* ========== 轴承型号数据库 ========== */
+const bearingDB = {
+  "6000":{D:26,B:8},"6001":{D:28,B:8},"6002":{D:32,B:9},"6003":{D:35,B:10},
+  "6004":{D:42,B:12},"6005":{D:47,B:12},"6006":{D:55,B:13},"6007":{D:62,B:14},
+  "6008":{D:68,B:15},"6009":{D:75,B:16},"6010":{D:80,B:16},"6011":{D:90,B:18},
+  "6012":{D:95,B:18},"6013":{D:100,B:18},"6014":{D:110,B:20},"6015":{D:115,B:20},
+  "6016":{D:125,B:22},"6017":{D:130,B:22},"6018":{D:140,B:24},"6019":{D:145,B:24},
+  "6020":{D:150,B:24},
+  "6200":{D:30,B:9},"6201":{D:32,B:10},"6202":{D:35,B:11},"6203":{D:40,B:12},
+  "6204":{D:47,B:14},"6205":{D:52,B:15},"6206":{D:62,B:16},"6207":{D:72,B:17},
+  "6208":{D:80,B:18},"6209":{D:85,B:19},"6210":{D:90,B:20},"6211":{D:100,B:21},
+  "6212":{D:110,B:22},"6213":{D:120,B:23},"6214":{D:125,B:24},"6215":{D:130,B:25},
+  "6216":{D:140,B:26},"6217":{D:150,B:28},"6218":{D:160,B:30},"6219":{D:170,B:32},
+  "6220":{D:180,B:34},
+  "6300":{D:35,B:11},"6301":{D:37,B:12},"6302":{D:40,B:12},"6303":{D:47,B:14},
+  "6304":{D:52,B:15},"6305":{D:62,B:17},"6306":{D:72,B:19},"6307":{D:80,B:21},
+  "6308":{D:90,B:23},"6309":{D:100,B:25},"6310":{D:110,B:27},"6311":{D:120,B:29},
+  "6312":{D:130,B:31},"6313":{D:140,B:33},"6314":{D:150,B:35},"6315":{D:160,B:37},
+  "6316":{D:170,B:39},"6317":{D:180,B:41},"6318":{D:190,B:43},"6319":{D:200,B:45},
+  "6320":{D:215,B:47},
+  "6403":{D:62,B:17},"6404":{D:72,B:19},"6405":{D:80,B:21},"6406":{D:90,B:23},
+  "6407":{D:100,B:25},"6408":{D:110,B:27},"6409":{D:120,B:29},"6410":{D:130,B:31},
+  "6411":{D:140,B:33},"6412":{D:150,B:35},"6413":{D:160,B:37},"6414":{D:175,B:41},
+  "6415":{D:190,B:45},"6416":{D:200,B:48},"6417":{D:210,B:52},"6418":{D:225,B:56},
+  "7200":{D:35,B:11},"7201":{D:37,B:12},"7202":{D:40,B:12},"7203":{D:47,B:14},
+  "7204":{D:52,B:15},"7205":{D:62,B:17},"7206":{D:72,B:19},"7207":{D:80,B:21},
+  "7208":{D:90,B:23},"7209":{D:100,B:25},"7210":{D:110,B:27},"7211":{D:120,B:29},
+  "7212":{D:130,B:31},"7213":{D:140,B:33},"7214":{D:150,B:35},"7215":{D:160,B:37},
+  "7216":{D:170,B:39},"7217":{D:180,B:41},"7218":{D:190,B:43},"7219":{D:200,B:45},
+  "7220":{D:215,B:47},
+  "N202":{D:35,B:11},"N203":{D:40,B:12},"N204":{D:47,B:14},"N205":{D:52,B:15},
+  "N206":{D:62,B:16},"N207":{D:72,B:17},"N208":{D:80,B:18},"N209":{D:85,B:19},
+  "N210":{D:90,B:20},"N211":{D:100,B:21},"N212":{D:110,B:22},"N213":{D:120,B:23},
+  "N214":{D:125,B:24},"N215":{D:130,B:25},"N216":{D:140,B:26},"N217":{D:150,B:28},
+  "N218":{D:160,B:30},"N219":{D:170,B:32},"N220":{D:180,B:34},
+  "NU202":{D:35,B:11},"NU203":{D:40,B:12},"NU204":{D:47,B:14},"NU205":{D:52,B:15},
+  "NU206":{D:62,B:16},"NU207":{D:72,B:17},"NU208":{D:80,B:18},"NU209":{D:85,B:19},
+  "NU210":{D:90,B:20},"NU211":{D:100,B:21},"NU212":{D:110,B:22},"NU213":{D:120,B:23},
+  "NU214":{D:125,B:24},"NU215":{D:130,B:25},"NU216":{D:140,B:26},"NU217":{D:150,B:28},
+  "NU218":{D:160,B:30},"NU219":{D:170,B:32},"NU220":{D:180,B:34},
+  "1200":{D:30,B:9},"1201":{D:32,B:10},"1202":{D:35,B:11},"1203":{D:40,B:12},
+  "1204":{D:47,B:14},"1205":{D:52,B:15},"1206":{D:62,B:16},"1207":{D:72,B:17},
+  "1208":{D:80,B:18},"1209":{D:85,B:19},"1210":{D:90,B:20},"1211":{D:100,B:21},
+  "1212":{D:110,B:22},"1213":{D:120,B:23},"1214":{D:125,B:24},"1215":{D:130,B:25},
+  "1216":{D:140,B:26},"1217":{D:150,B:28},"1218":{D:160,B:30},"1219":{D:170,B:32},
+  "1220":{D:180,B:34},
+  "22205":{D:52,B:18},"22206":{D:62,B:20},"22207":{D:72,B:23},"22208":{D:80,B:23},
+  "22209":{D:85,B:23},"22210":{D:90,B:23},"22211":{D:100,B:25},"22212":{D:110,B:28},
+  "22213":{D:120,B:31},"22214":{D:125,B:31},"22215":{D:130,B:31},"22216":{D:140,B:33},
+  "22217":{D:150,B:36},"22218":{D:160,B:40},"22219":{D:170,B:43},"22220":{D:180,B:46},
+  "22308":{D:90,B:33},"22309":{D:100,B:36},"22310":{D:110,B:40},"22311":{D:120,B:43},
+  "22312":{D:130,B:46},"22313":{D:140,B:48},"22314":{D:150,B:51},"22315":{D:160,B:55},
+  "22316":{D:170,B:58},"22317":{D:180,B:60},"22318":{D:190,B:64},"22319":{D:200,B:67},
+  "22320":{D:215,B:73},
+  "30203":{D:40,B:14},"30204":{D:47,B:15},"30205":{D:52,B:17},"30206":{D:62,B:17},
+  "30207":{D:72,B:18},"30208":{D:80,B:20},"30209":{D:85,B:21},"30210":{D:90,B:22},
+  "30211":{D:100,B:23},"30212":{D:110,B:24},"30213":{D:120,B:26},"30214":{D:125,B:27},
+  "30215":{D:130,B:28},"30216":{D:140,B:29},"30217":{D:150,B:31},"30218":{D:160,B:33},
+  "30219":{D:170,B:35},"30220":{D:180,B:37},
+  "32204":{D:47,B:19},"32205":{D:52,B:19},"32206":{D:62,B:21},"32207":{D:72,B:24},
+  "32208":{D:80,B:25},"32209":{D:85,B:26},"32210":{D:90,B:24},"32211":{D:100,B:27},
+  "32212":{D:110,B:30},"32213":{D:120,B:33},"32214":{D:125,B:34},"32215":{D:130,B:35},
+  "32216":{D:140,B:37},"32217":{D:150,B:40},"32218":{D:160,B:43},"32219":{D:170,B:46},
+  "32220":{D:180,B:49},
+  "51100":{D:26,B:9},"51101":{D:28,B:9},"51102":{D:30,B:9},"51103":{D:35,B:10},
+  "51104":{D:40,B:11},"51105":{D:42,B:11},"51106":{D:47,B:12},"51107":{D:52,B:12},
+  "51108":{D:60,B:13},"51109":{D:68,B:15},"51110":{D:70,B:14},"51111":{D:78,B:16},
+  "51112":{D:85,B:17},"51113":{D:90,B:18},"51114":{D:95,B:18},"51115":{D:100,B:19},
+  "51116":{D:110,B:19},"51117":{D:120,B:19},"51118":{D:125,B:22},"51120":{D:150,B:25},
+  "6330":{D:320,B:65},"6330 C3":{D:320,B:65},
+  "32008":{D:68,B:19},"32010":{D:80,B:21},
+  "NUP312":{D:130,B:34},"NJ312":{D:130,B:31},
+  "23144":{D:370,B:120},"23244":{D:400,B:144},
+  "24044":{D:340,B:118},"24144":{D:360,B:150},
+  "22244":{D:400,B:108},"22344":{D:420,B:140}
+};
+
+// 修正系数表
+const tempMap = {"低":0.8,"中":1.0,"高":1.8,"超高":3.0};
+const loadMap = {"低":1.0,"中":1.7,"高":2.5,"很高":5.0};
+const contamMap = {"低":1.0,"中":1.10,"高":1.25};
+const rpmMap = {"低":0.5,"中":1.0,"高":1.25,"很高":2.0};
+
+// 当月天数
+const now = new Date();
+const monthDays = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+document.getElementById('calcDaysVal').textContent = monthDays;
+
+// 填充轴承型号下拉
+(function(){
+  const sel = document.getElementById('calcModel');
+  const keys = Object.keys(bearingDB).sort();
+  keys.forEach(k => {
+    const op = document.createElement('option');
+    op.value = k; op.text = k;
+    sel.appendChild(op);
+  });
+})();
+
+function onModelChange(){
+  const v = document.getElementById('calcModel').value;
+  if (bearingDB[v]) {
+    document.getElementById('calcD').value = bearingDB[v].D;
+    document.getElementById('calcB').value = bearingDB[v].B;
+  }
+  calcGrease();
+}
+
+function calcGrease() {
+  const grid = document.getElementById('calcResultGrid');
+  const monthlyRow = document.getElementById('calcMonthlyRow');
+  const d = parseFloat(document.getElementById('calcD').value);
+  const b = parseFloat(document.getElementById('calcB').value);
+  if (isNaN(d) || isNaN(b) || d <= 0 || b <= 0) {
+    grid.classList.remove('show');
+    monthlyRow.style.display = 'none';
+    return;
+  }
+  const method = document.getElementById('calcMethod').value;
+  const N = Math.max(1, parseInt(document.getElementById('calcN').value) || 30);
+  const k = (method === 'both') ? 0.005 : 0.002;
+  const Gp = k * d * b;
+
+  const tempC = tempMap[document.getElementById('calcTemp').value] || 1;
+  const rpmC = rpmMap[document.getElementById('calcRPM').value] || 1;
+  const loadC = loadMap[document.getElementById('calcLoad').value] || 1;
+  const contC = contamMap[document.getElementById('calcContam').value] || 1;
+  const totalCoef = tempC * rpmC * loadC * contC;
+
+  const dailyUse = (Gp / N) * totalCoef;
+  const Nsuggest = Math.max(1, Math.round(N / totalCoef));
+  const monthly = dailyUse * monthDays;
+
+  document.getElementById('calcGpVal').textContent = Gp.toFixed(2);
+  document.getElementById('calcCoefVal').textContent = totalCoef.toFixed(3);
+  document.getElementById('calcDailyVal').textContent = dailyUse.toFixed(3);
+  document.getElementById('calcSuggestN').textContent = Nsuggest;
+  document.getElementById('calcMonthlyVal').textContent = monthly.toFixed(2);
+
+  grid.classList.add('show');
+  monthlyRow.style.display = 'flex';
+}
+</script>
+</body>
+</html>
